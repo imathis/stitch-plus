@@ -3,7 +3,8 @@
 A CommonJS JavaScript package management solution powered by [Stitch-rb](https://github.com/maccman/stitch-rb). Stitch Plus adds some nice features including:
 
 - Optionally [uglify](https://github.com/lautis/uglifier) javascript output.
-- Easily fingerprint the file name.
+- Each build is fingerprinted with a comment to avoid unnecessary compiling.
+- Easily fingerprint the file name for cache busting power.
 - Remove previously generated files with each compile.
 - Designed to integrate with Guard via [guard-stitch-plus](https://github.com/imathis/guard-stitch-plus).
 
