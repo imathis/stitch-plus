@@ -6,15 +6,16 @@ class StitchPlus
 
   def initialize(options)
     @options = {
-      :dependencies   => [],
-      :output         => 'all.js',
-      :fingerprint    => false,
+      :dependencies   => nil,
       :paths          => nil,
+      :write          => 'all.js',
+      :fingerprint    => false,
       :cleanup        => true,
-      :all_on_start   => false,
-      :run_all        => nil,
-      :uglify         => false
-    }.merge(options)
+      :uglify         => false,
+      :uglify_options => {}
+    }
+    
+    set_options(options, false)
 
     begin
       require 'coffee-script'
@@ -22,21 +23,39 @@ class StitchPlus
     rescue LoadError
     end
 
+  end
+
+  def set_options(options={}, reset=true)
+    @old_options = @options if reset
+    @options = @options.merge(options)
+
     if @options[:uglify]
       begin
         require 'uglifier'
-        @uglifier = Uglifier.new
+        @uglifier = Uglifier.new(@options[:uglify_options])
       rescue LoadError
       end
     end
-      
+
+    @options
   end
 
-  def compile
+  def reset_options
+    if @old_options
+      @options = @old_options
+      @old_options = nil
+    end
+  end
 
-    @files ||= all_files
+  def compile(options=nil)
+    set_options(options) if options
+    @options[:write] ? write : build
+    reset_options if options
+  end
 
-    if @files.join().match(/\.coffee/) and !@has_coffee
+  def build
+
+    if all_files.join().match(/\.coffee/) and !@has_coffee
       error "Cannot compile coffeescript".red
       error "Add ".white + "gem 'coffee-script'".yellow + " to your Gemfile."
     end
@@ -46,10 +65,25 @@ class StitchPlus
       error "Add ".white + "gem 'uglifier'".yellow + " to your Gemfile."
     end
 
-    @fingerprint = script_fingerprint
-    @file = output_file(@fingerprint)
+    begin
+      js = Stitch::Package.new(:dependencies => dependencies, :paths => @options[:paths]).compile
+      js = @uglifier.compile(js) if @uglifier
+      js
+    rescue StandardError => e
+      error "Stitch failed to build".red
+      error e
+      false
+    end
+  end
 
-    if has_fingerprint(@file)
+  def write
+
+    @fingerprint = script_fingerprint
+    @file = output_file
+
+    js = "/* Build fingerprint: #{@fingerprint} */\n" + build
+
+    if has_fingerprint(@file, @fingerprint)
       info "Stitch " + "identical ".green + @file
       true
     else
@@ -57,40 +91,45 @@ class StitchPlus
         write_msg = (File.exists?(@file) ? "overwrite " : "created ").yellow + @file
         cleanup(@file) if @options[:cleanup]
 
-        js = Stitch::Package.new(:dependencies => dependencies, :paths => @options[:paths]).compile
-        js = @uglifier.compile(js) if @uglifier
-        js = "/* Build fingerprint: #{@fingerprint} */\n" + js
-
         File.open(@file, 'w') { |f| f.write js }
 
         info "Stitch " + write_msg
         true
       rescue StandardError => e
-        error "Stitch " + "failed ".red + "to write #{@file}"
+        error "Stitch failed to write #{@file}".red
         error e
         false
       end
     end
+
   end
 
   def dependencies
-    deps = [] << @options[:dependencies]
-    deps.flatten.collect { |item| 
-      item = File.join(item,'**/*') if File.directory?(item)
-      Dir.glob item
-    }.flatten.uniq.collect { |item|
-      File.directory?(item) ? nil : item 
-    }.compact
+    if @options[:dependencies]
+      deps = [] << @options[:dependencies]
+      deps.flatten.collect { |item| 
+        item = File.join(item,'**/*') if File.directory?(item)
+        Dir.glob item
+      }.flatten.uniq.collect { |item|
+        File.directory?(item) ? nil : item 
+      }.compact
+    else
+      false
+    end
   end
 
-  def output_file(fingerprint = nil)
-    fingerprint ||= script_fingerprint
-    file = @options[:output]
+  def output_file(options=nil)
+    set_options(options) if options
+    file = @options[:write]
+
     if @options[:fingerprint]
-      basename = File.basename(file).split(/(\..+)$/).join("-#{fingerprint}")
+      @fingerprint ||= script_fingerprint
+      basename = File.basename(file).split(/(\..+)$/).join("-#{@fingerprint}")
       dir = File.dirname(file)
       file = File.join(dir, basename)
     end
+
+    reset_options if options
     file
   end
   
@@ -104,18 +143,17 @@ class StitchPlus
 
   # Get and MD5 hash of files including order of dependencies
   def script_fingerprint
-    @files ||= all_files
-    Digest::MD5.hexdigest(@files.map! { |path| "#{File.mtime(path).to_i}" }.join + @options.to_s)
+    Digest::MD5.hexdigest(all_files.map! { |path| "#{File.mtime(path).to_i}" }.join + @options.to_s)
   end
 
   # Determine if the file has a fingerprint
-  def has_fingerprint(file)
-    File.size?(file) && File.open(file) {|f| f.readline} =~ /#{@fingerprint}/
+  def has_fingerprint(file, fingerprint)
+    File.size?(file) && File.open(file) {|f| f.readline} =~ /#{fingerprint}/
   end
 
   def cleanup(file)
-    match = File.basename(@options[:output]).split(/(\..+)$/).map { |i| i.gsub(/\./, '\.')}
-    Dir.glob(File.join(File.dirname(@options[:output]), '**/*')).each do |item|
+    match = File.basename(@options[:write]).split(/(\..+)$/).map { |i| i.gsub(/\./, '\.')}
+    Dir.glob(File.join(File.dirname(@options[:write]), '**/*')).each do |item|
       if File.basename(item) != File.basename(file) and File.basename(item).match /^#{match[0]}(-.+)?#{match[1]}/i
         info "Stitch " + "deleted ".red + item
         FileUtils.rm(item) 
@@ -140,7 +178,5 @@ class StitchPlus
       puts message
     end
   end
-
-
 end
 
