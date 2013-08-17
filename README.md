@@ -64,9 +64,55 @@ This guard has these configurations.
 | `write`          | A path to write the compiled javascript                                    | 'all.js'    |
 | `fingerprint`    | Add a fingerprint to the file name for super cache busting power           | false       |
 | `cleanup`        | Automatically remove previously compiled files                             | true        |
-| `uglify`         | Smush javascript using the Uglifier gem                                    | false       |
+| `uglify`         | Smash javascript using the Uglifier gem                                    | false       |
 | `uglify_options` | Options for the Uglifier gem. See the [Uglifier docs](https://github.com/lautis/uglifier#usage) for details. | {}       |
 
+
+### Regarding "Dependencies"
+
+When using `dependencies`, order matters, directories are globbed, and files will only be included once for each listing. For example, if you are working on something with jQuery and Backbone.js, your dependencies might look like this:
+
+```
+dependencies: ['js/deps/jquery.js', 'js/deps/underscore.js', 'js/deps/backbone.js', 'js/deps']
+```
+
+This will add—in order—jQuery, Underscore.js and Backbone.js, followed by any other files in the `js/deps` directory.
+
+
+### Regarding "Paths"
+
+Javascrpts which are included as paths will be added to the output javascript, after any dependencies, and will be wrapped up as CommonJS modules. Stitch will add its
+own require function which allows these scripts to be loaded as modules, then it will write each script as a member of a hash, with the file path as the key. For
+example.
+
+A the script `js/deps/test-module.js` containing the following:
+
+```js
+var Test = {
+  init: function(){
+    console.log('initialized!');
+  }
+}
+
+module.exports = Test;
+```
+
+will be added to the hash and surrounded with the following:
+
+```js
+"test-module": function(exports, require, module) {
+  // the original script
+}
+```
+
+This allows other scripts to load the module with
+
+```js
+test = require('test-module')
+test.init() // logs 'initialized!' to the console
+```
+
+Author's note: I feel like `paths` is a stupid name for this option, but I have left it as-is to be consistent with Stitch.
 
 ## Contributing
 
