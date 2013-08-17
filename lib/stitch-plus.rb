@@ -4,6 +4,7 @@ require 'colorator'
 require 'yaml'
 
 class StitchPlus
+  attr_accessor :options
 
   def initialize(options={})
 
@@ -54,7 +55,7 @@ class StitchPlus
   end
 
   # Compile javascripts, uglifying if necessary
-  def build
+  def compile
 
     if all_files.join().match(/\.coffee/) and !@has_coffee
       error "Cannot compile coffeescript".red
@@ -71,14 +72,14 @@ class StitchPlus
       js = @uglifier.compile(js) if @uglifier
       js
     rescue StandardError => e
-      error "Stitch failed to build".red
+      error "Stitch failed to compile".red
       error e
       false
     end
   end
 
   # Write compiled javascripts to disk
-  def compile(options=nil)
+  def write(options=nil)
     temp_options(options) if options
 
     @fingerprint = file_fingerprint

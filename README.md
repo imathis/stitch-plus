@@ -28,32 +28,34 @@ Or install it yourself as:
 # options can be a hash or a path to a yaml file
 s = StitchPlus.new(options)
 
-# Compile  javascript 
+# Returns compiled javascript
 s.compile
 
-# Return the compiled javascript instead of writing to disk
-s.build
+# Writes compiled javascript to disk (`output` config determines filename)
+s.write
 
 # Get compiled filename
 s.output_file #> javascripts/app-f1408932717b4b16eb97969d34961213.js
 
-# Get a list of javascripts to be compiled, in order
+# Return the array of javascripts to be compiled
 s.all_files
 
-# Get the fingerprint to be used
+# Return the fingerprint to be used
 s.file_fingerprint
 
 # Permanently modify the config options
 s.set_options({output: 'foo.js'})
 
-```
-
-All methods will accept an options hash which will temporarily override
-previous options options, for example:
-
+# Return a hash of the options
+s.options
 
 ```
-s.build({fingerprint: 'false'})
+
+All methods will accept an options hash which will temporarily override previous options options, for example:
+
+
+```
+s.write({fingerprint: 'false'})
 ```
 
 This will disable fingerprinting of the filename temporarily and write to app.js instead of the fingerprinted filename.
@@ -89,9 +91,7 @@ stitch:
 Then you could call stitch like this:
 
 ```ruby
-require 'stitch-plus'
-
-StitchPlus.new('stitch.yml').compile
+js = StitchPlus.new('stitch.yml').compile
 ```
 
 ### Regarding "Dependencies"

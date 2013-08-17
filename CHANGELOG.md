@@ -7,3 +7,9 @@
 - Fixed fingerprints.
 - set_options is now a public method
 - changed option `write` to `output`
+
+## 1.0.2
+- Renamed 'build' method to 'compile' to be consistent with Stitch and Uglify.
+- Renamed old 'compile' to 'write' since it actually writes files.
+- Options can be accessed now for easier inspection
+
