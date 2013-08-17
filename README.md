@@ -25,37 +25,40 @@ Or install it yourself as:
 ## Usage
 
 ```ruby
-require 'stitch-plus'
+# options can be a hash or a path to a yaml file
+s = StitchPlus.new(options)
 
-options = {
-  dependencies: ['javascripts/dependencies'],
-  paths: ['javascripts/modules'],
-  write: 'javascripts/app.js',
-  fingerprint: true
-}
+# Compile  javascript 
+s.compile
 
-stitch = StitchPlus.new(options)
+# Return the compiled javascript instead of writing to disk
+s.build
 
-stitch.compile
-# > Stitch created javascripts/app-f1408932717b4b16eb97969d34961213.js
+# Get compiled filename
+s.output_file #> javascripts/app-f1408932717b4b16eb97969d34961213.js
 
-# You an temporarily override an option
+# Get a list of javascripts to be compiled, in order
+s.all_files
 
-stitch.compile({fingerprint: false})
-# > Stitch deleted javascripts/app-f1408932717b4b16eb97969d34961213.js
-# > Stitch created javascripts/app.js
-
-# Or permanently change an option
-
-stitch.set_options({write: false})
-js = stitch.compile
-# No output. Compiled javascript is returned as a string. 
+# Get the fingerprint to be used
+s.file_fingerprint
 
 ```
 
+All methods will accept an options hash which will temporarily override
+previous options options, for example:
+
+
+```
+s.build({fingerprint: 'false'})
+```
+
+This will disable fingerprinting of the filename temporarily and write to app.js instead of the fingerprinted filename.
+
+
 ## Configuration
 
-This guard has these configurations.
+You can configure StichPlus as like this.
 
 | Config           | Description                                                                | Default     |
 |:-----------------|:---------------------------------------------------------------------------|:------------|
@@ -67,6 +70,26 @@ This guard has these configurations.
 | `uglify`         | Smash javascript using the Uglifier gem                                    | false       |
 | `uglify_options` | Options for the Uglifier gem. See the [Uglifier docs](https://github.com/lautis/uglifier#usage) for details. | {}       |
 
+### Reading configuration from a file
+
+Stitch can also read configurations from a YAML file. For example, you could
+create a `stitch.yml` containing the following:
+
+```yaml
+stitch:
+  dependencies: ['javascripts/dependencies']
+  paths: ['javascripts/modules']
+  write: 'javascripts/app.js'
+  fingerprint: true
+```
+
+Then you could call stitch like this:
+
+```ruby
+require 'stitch-plus'
+
+StitchPlus.new('stitch.yml').compile
+```
 
 ### Regarding "Dependencies"
 

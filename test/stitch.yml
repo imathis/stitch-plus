@@ -1,0 +1,5 @@
+stitch:
+  dependencies: ['javascripts/dependencies']
+  paths: ['javascripts/modules']
+  write: 'javascripts/app.js'
+  fingerprint: true
