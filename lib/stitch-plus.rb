@@ -10,14 +10,14 @@ class StitchPlus
     @options = {
       :dependencies   => nil,
       :paths          => nil,
-      :write          => 'all.js',
+      :output         => 'all.js',
       :fingerprint    => false,
       :cleanup        => true,
       :uglify         => false,
       :uglify_options => {}
     }
 
-    set_options(options, false)
+    set_options(options)
 
     begin
       require 'coffee-script'
@@ -28,15 +28,15 @@ class StitchPlus
   end
 
   # Set or temporarily set options
-  def set_options(options={}, reset=true)
-    @old_options = @options if reset
+  def set_options(options={}, temporary=false)
+    @old_options = @options if temporary
 
     # If options is a file path, read options from yaml
     if options.class == String and File.exist? options
       options = load_options(options)
     end
 
-    @options = @options.merge options
+    @options = @options.merge symbolize_keys(options)
 
     if @options[:uglify]
       begin
@@ -47,6 +47,10 @@ class StitchPlus
     end
 
     @options
+  end
+
+  def temp_options(options)
+    set_options(options, true)
   end
 
   # Compile javascripts, uglifying if necessary
@@ -75,7 +79,7 @@ class StitchPlus
 
   # Write compiled javascripts to disk
   def compile(options=nil)
-    set_options(options) if options
+    temp_options(options) if options
 
     @fingerprint = file_fingerprint
     @file = output_file
@@ -107,8 +111,8 @@ class StitchPlus
 
   # return the compiled js path including fingerprint if necessary
   def output_file(options=nil)
-    set_options(options) if options
-    file = @options[:write]
+    temp_options(options) if options
+    file = @options[:output]
 
     if @options[:fingerprint]
       @fingerprint ||= file_fingerprint
@@ -123,7 +127,7 @@ class StitchPlus
 
   # Get a list of all files to be stitched
   def all_files(options=nil)
-    set_options(options) if options
+    temp_options(options) if options
     files = []
     files << dependencies if @options[:dependencies]
     files << Dir.glob(File.join(@options[:paths], '**/*')) if @options[:paths]
@@ -133,17 +137,18 @@ class StitchPlus
 
   # Get and MD5 hash of files including order of dependencies
   def file_fingerprint(options=nil)
-    set_options(options) if options
-    Digest::MD5.hexdigest(all_files.map! { |path| "#{File.mtime(path).to_i}" }.join + @options.to_s)
+    temp_options(options) if options
+    fingerprint = Digest::MD5.hexdigest(all_files.map! { |path| "#{File.mtime(path).to_i}" }.join + @options.to_s)
     reset_options if options
+    fingerprint
   end
 
   private
   
-  # Remove existing generated files with the same options[:write] name
+  # Remove existing generated files with the same options[:output] name
   def cleanup(file)
-    match = File.basename(@options[:write]).split(/(\..+)$/).map { |i| i.gsub(/\./, '\.')}
-    Dir.glob(File.join(File.dirname(@options[:write]), '**/*')).each do |item|
+    match = File.basename(@options[:output]).split(/(\..+)$/).map { |i| i.gsub(/\./, '\.')}
+    Dir.glob(File.join(File.dirname(@options[:output]), '**/*')).each do |item|
       if File.basename(item) != File.basename(file) and File.basename(item).match /^#{match[0]}(-.+)?#{match[1]}/i
         info "Stitch " + "deleted ".red + item
         FileUtils.rm(item)
@@ -198,7 +203,6 @@ class StitchPlus
   def load_options(file)
     options = YAML::load(File.open(file)) if File.exist? file
     options = options['stitch'] unless options['stitch'].nil?
-    options = symbolize_keys(options)
     options
   end
 

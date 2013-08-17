@@ -43,6 +43,9 @@ s.all_files
 # Get the fingerprint to be used
 s.file_fingerprint
 
+# Permanently modify the config options
+s.set_options({output: 'foo.js'})
+
 ```
 
 All methods will accept an options hash which will temporarily override
@@ -64,7 +67,7 @@ You can configure StichPlus as like this.
 |:-----------------|:---------------------------------------------------------------------------|:------------|
 | `dependencies`   | Array of files/directories to be added first as global javascripts         | nil         |
 | `paths`          | Array of directories where javascripts will be wrapped as CommonJS modules | nil         |
-| `write`          | A path to write the compiled javascript                                    | 'all.js'    |
+| `output`         | A path to write the compiled javascript                                    | 'all.js'    |
 | `fingerprint`    | Add a fingerprint to the file name for super cache busting power           | false       |
 | `cleanup`        | Automatically remove previously compiled files                             | true        |
 | `uglify`         | Smash javascript using the Uglifier gem                                    | false       |
@@ -79,7 +82,7 @@ create a `stitch.yml` containing the following:
 stitch:
   dependencies: ['javascripts/dependencies']
   paths: ['javascripts/modules']
-  write: 'javascripts/app.js'
+  output: 'javascripts/app.js'
   fingerprint: true
 ```
 

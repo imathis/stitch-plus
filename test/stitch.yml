@@ -1,5 +1,5 @@
 stitch:
   dependencies: ['javascripts/dependencies']
   paths: ['javascripts/modules']
-  write: 'javascripts/app.js'
+  output: 'javascripts/app.js'
   fingerprint: true
