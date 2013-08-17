@@ -8,8 +8,8 @@ Gem::Specification.new do |gem|
   gem.version       = StitchPlusVersion::VERSION
   gem.authors       = ["Brandon Mathis"]
   gem.email         = ["brandon@imathis.com"]
-  gem.description   = %q{A nicer way to combine and uglify javascript with fingerprinting and modularization. Powered by Stitch.}
-  gem.summary       = %q{A nicer way to combine and uglify javascript with fingerprinting and modularization. Powered by Stitch.}
+  gem.description   = %q{A nicer way to combine and uglify javascript with fingerprinting and modularization. Powered by StitchPlus.}
+  gem.summary       = %q{A nicer way to combine and uglify javascript with fingerprinting and modularization. Powered by StitchPlus.}
   gem.homepage      = "https://github.com/imathis/stitch-plus"
   gem.license       = "MIT"
 

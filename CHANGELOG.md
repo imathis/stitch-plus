@@ -13,3 +13,6 @@
 - Renamed old 'compile' to 'write' since it actually writes files.
 - Options can be accessed now for easier inspection
 
+## 1.0.3
+- Fixed an issue where write was attempting to call old build method.
+

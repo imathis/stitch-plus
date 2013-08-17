@@ -85,7 +85,7 @@ class StitchPlus
     @fingerprint = file_fingerprint
     @file = output_file
 
-    js = "/* Build fingerprint: #{@fingerprint} */\n" + build
+    js = "/* Build fingerprint: #{@fingerprint} */\n" + compile
 
     if has_fingerprint(@file, @fingerprint)
       info "Stitch " + "identical ".green + @file
