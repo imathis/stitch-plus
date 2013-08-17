@@ -16,3 +16,5 @@
 ## 1.0.3
 - Fixed an issue where write was attempting to call old build method.
 
+## 1.0.4
+- Options hash now accepts `config` which can point to a YAML file to load configurations.

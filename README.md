@@ -25,7 +25,7 @@ Or install it yourself as:
 ## Usage
 
 ```ruby
-# options can be a hash or a path to a yaml file
+# options can be a hash or a path to a YAML file
 s = StitchPlus.new(options)
 
 # Returns compiled javascript
@@ -53,7 +53,6 @@ s.options
 
 All methods will accept an options hash which will temporarily override previous options options, for example:
 
-
 ```
 s.write({fingerprint: 'false'})
 ```
@@ -63,10 +62,11 @@ This will disable fingerprinting of the filename temporarily and write to app.js
 
 ## Configuration
 
-You can configure StichPlus as like this.
+Stitch Plus will accept a hash of options or a string containing a path to a YAML file. 
 
 | Config           | Description                                                                | Default     |
 |:-----------------|:---------------------------------------------------------------------------|:------------|
+| `config`         | A path to a YAML file containing stitch configurations                     | nil         |
 | `dependencies`   | Array of files/directories to be added first as global javascripts         | nil         |
 | `paths`          | Array of directories where javascripts will be wrapped as CommonJS modules | nil         |
 | `output`         | A path to write the compiled javascript                                    | 'all.js'    |
@@ -75,7 +75,10 @@ You can configure StichPlus as like this.
 | `uglify`         | Smash javascript using the Uglifier gem                                    | false       |
 | `uglify_options` | Options for the Uglifier gem. See the [Uglifier docs](https://github.com/lautis/uglifier#usage) for details. | {}       |
 
-### Reading configuration from a file
+Note: Configurations loaded from a YAML file will override any settings in your config hash. So `{config: 'stitch.yml', uglify: false}` will be overwritten if the yaml
+file sets `uglify: true`.
+
+### Configuring with YAML
 
 Stitch can also read configurations from a YAML file. For example, you could
 create a `stitch.yml` containing the following:
@@ -91,7 +94,7 @@ stitch:
 Then you could call stitch like this:
 
 ```ruby
-js = StitchPlus.new('stitch.yml').compile
+js = StitchPlus.new({config: 'stitch.yml'}).compile
 ```
 
 ### Regarding "Dependencies"

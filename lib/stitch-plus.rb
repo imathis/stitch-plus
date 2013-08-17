@@ -15,7 +15,8 @@ class StitchPlus
       :fingerprint    => false,
       :cleanup        => true,
       :uglify         => false,
-      :uglify_options => {}
+      :uglify_options => {},
+      :config         => nil
     }
 
     set_options(options)
@@ -33,9 +34,8 @@ class StitchPlus
     @old_options = @options if temporary
 
     # If options is a file path, read options from yaml
-    if options.class == String and File.exist? options
-      options = load_options(options)
-    end
+    options = { :config => options } if options.class == String
+    options = load_options(options)
 
     @options = @options.merge symbolize_keys(options)
 
@@ -47,7 +47,6 @@ class StitchPlus
       end
     end
 
-    @options
   end
 
   def temp_options(options)
@@ -201,9 +200,12 @@ class StitchPlus
     end
   end
 
-  def load_options(file)
-    options = YAML::load(File.open(file)) if File.exist? file
-    options = options['stitch'] unless options['stitch'].nil?
+  def load_options(options)
+    if options[:config] and File.exist? options[:config]
+      config = YAML::load(File.open(options[:config]))
+      config = config['stitch'] unless config['stitch'].nil?
+      options = options.merge config
+    end
     options
   end
 
