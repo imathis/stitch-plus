@@ -18,3 +18,6 @@
 
 ## 1.0.4
 - Options hash now accepts `config` which can point to a YAML file to load configurations.
+
+## 1.0.5
+- [instance].last_write returns the path to the last written file.

@@ -109,7 +109,7 @@ class StitchPlus
 
   end
 
-  # return the compiled js path including fingerprint if necessary
+  # return the compiled js path including fingerprint if enabled
   def output_file(options=nil)
     temp_options(options) if options
     file = @options[:output]
@@ -123,6 +123,13 @@ class StitchPlus
 
     reset_options if options
     file
+  end
+
+  # Return the path for the last file written
+  # This exists because it's more performant than calling output_file unnecessarily
+  #
+  def last_write
+    @file
   end
 
   # Get a list of all files to be stitched

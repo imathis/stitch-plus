@@ -31,11 +31,14 @@ s = StitchPlus.new(options)
 # Returns compiled javascript
 s.compile
 
+# Get what path to the compiled file will be
+s.output_file #> javascripts/app-f1408932717b4b16eb97969d34961213.js
+
 # Writes compiled javascript to disk (`output` config determines filename)
 s.write
 
-# Get compiled filename
-s.output_file #> javascripts/app-f1408932717b4b16eb97969d34961213.js
+# Get the path to the most recently written file (or nil)
+s.last_write #> javascripts/app-f1408932717b4b16eb97969d34961213.js
 
 # Return the array of javascripts to be compiled
 s.all_files

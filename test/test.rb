@@ -7,3 +7,4 @@ puts "Javascripts to be compiled:"
 puts s.all_files.map { |f| "  #{f}"}
 
 s.write
+p s.last_write
