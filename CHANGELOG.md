@@ -28,3 +28,6 @@
 
 ## 1.0.7
 - Paths appearing in messages will now start from the current directory
+
+## 1.0.8
+- Fixes for 1.0.7, removed leading slashes from paths in messages.
