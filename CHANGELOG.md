@@ -21,3 +21,7 @@
 
 ## 1.0.5
 - [instance].last_write returns the path to the last written file.
+
+## 1.0.6
+- [instance].deleted returns an array of deleted files if stitch cleaned up files when writing.
+- performance improvements for cleanup method.

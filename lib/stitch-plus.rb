@@ -4,7 +4,7 @@ require 'colorator'
 require 'yaml'
 
 class StitchPlus
-  attr_accessor :options
+  attr_accessor :options, :deleted
 
   def initialize(options={})
 
@@ -18,6 +18,7 @@ class StitchPlus
       :uglify_options => {},
       :config         => nil
     }
+    @deleted = []
 
     set_options(options)
 
@@ -154,11 +155,11 @@ class StitchPlus
   
   # Remove existing generated files with the same options[:output] name
   def cleanup(file)
-    match = File.basename(@options[:output]).split(/(\..+)$/).map { |i| i.gsub(/\./, '\.')}
-    Dir.glob(File.join(File.dirname(@options[:output]), '**/*')).each do |item|
-      if File.basename(item) != File.basename(file) and File.basename(item).match /^#{match[0]}(-.+)?#{match[1]}/i
+    Dir.glob(@options[:output].sub(/\./, '*')).each do |item|
+      if File.basename(item) != File.basename(file)
         info "Stitch " + "deleted ".red + item
         FileUtils.rm(item)
+        @deleted << item
       end
     end
   end
