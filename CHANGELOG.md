@@ -25,3 +25,6 @@
 ## 1.0.6
 - [instance].deleted returns an array of deleted files if stitch cleaned up files when writing.
 - performance improvements for cleanup method.
+
+## 1.0.7
+- Paths appearing in messages will now start from the current directory

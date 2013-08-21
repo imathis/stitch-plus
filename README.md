@@ -40,6 +40,9 @@ s.write
 # Get the path to the most recently written file (or nil)
 s.last_write #> javascripts/app-f1408932717b4b16eb97969d34961213.js
 
+# Return an array of files deleted by cleanup
+s.deleted
+
 # Return the array of javascripts to be compiled
 s.all_files
 

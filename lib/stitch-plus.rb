@@ -88,12 +88,12 @@ class StitchPlus
     js = "/* Build fingerprint: #{@fingerprint} */\n" + compile
 
     if has_fingerprint(@file, @fingerprint)
-      info "Stitch " + "identical ".green + @file
+      info "Stitch " + "identical ".green + @file.sub(Dir.pwd, '')
       reset_options if options
       true
     else
       begin
-        write_msg = (File.exists?(@file) ? "overwrite " : "created ").yellow + @file
+        write_msg = (File.exists?(@file) ? "overwrite " : "created ").yellow + @file.sub(Dir.pwd, '')
         cleanup(@file) if @options[:cleanup]
 
         File.open(@file, 'w') { |f| f.write js }
@@ -101,7 +101,7 @@ class StitchPlus
         info "Stitch " + write_msg
         true
       rescue StandardError => e
-        error "Stitch failed to write #{@file}".red
+        error "Stitch failed to write #{@file.sub(Dir.pwd, '')}".red
         error e
         reset_options if options
         false
@@ -159,7 +159,7 @@ class StitchPlus
       if File.basename(item) != File.basename(file)
         info "Stitch " + "deleted ".red + item
         FileUtils.rm(item)
-        @deleted << item
+        @deleted << item.sub(Dir.pwd, '')
       end
     end
   end
