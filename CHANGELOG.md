@@ -31,3 +31,6 @@
 
 ## 1.0.8
 - Fixes for 1.0.7, removed leading slashes from paths in messages.
+
+## 1.0.9
+- Creates directories in the path to output file if necessary

@@ -96,6 +96,7 @@ class StitchPlus
         write_msg = (File.exists?(@file) ? "overwrite " : "created ").yellow + @file.sub("#{Dir.pwd}/", '')
         cleanup(@file) if @options[:cleanup]
 
+        FileUtils.mkdir_p(File.dirname(@file))
         File.open(@file, 'w') { |f| f.write js }
 
         info "Stitch " + write_msg
